@@ -32,7 +32,7 @@
               </td>
               <td>
                   <div class="text-left mr-auto tip-content">
-                    <ae-text face="mono-xs" class="tip-url" > {{ tip.url }} </ae-text>
+                    <ae-text face="mono-xs" class="tip-url" > <a :href="tip.url"> {{ tip.url }} </a> </ae-text>
                     <ae-text length="flat" class="sender"> {{ tip.sender }} </ae-text>
                     <ae-text face="mono-xs" class="tip-note" > {{ tip.note }} </ae-text>
                 </div>
