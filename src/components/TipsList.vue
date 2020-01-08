@@ -163,7 +163,7 @@
             }
         },
         async created() {
-            this.loadingProgress = "initializing sdk client";
+            this.loadingProgress = "fetching tips";
             this.client = await Universal({
                 url: this.nodeUrl,
                 internalUrl: this.nodeUrl,
