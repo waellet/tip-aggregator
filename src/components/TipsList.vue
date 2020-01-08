@@ -7,21 +7,48 @@
     </div>
     <div id="app-content">
       <h2>tip explorer</h2>
+
+      <p>
+        Welcome to the aeternity tips explorer.
+        
+        <br> To start tipping and receiving tips install the <a href="https://waellet.com">waellet</a> extension
+      </p>
+
       <div class="container">
-          <ae-list v-if="tips && tips.length">
-            <ae-list-item fill="neutral" v-for="(tip,index) in tips" :key="index">
+        <table class="table table-responsive">
+          <thead>
+            <tr>
+              <th></th>
+              <th>URL / Tipper / Tipnote</th>
+              <th>Timestamp</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(tip,index) in tips" :key="index">
+              <td>
                 <ae-identicon class="identicon" :address="tip.sender" size="base" />
-                <div class="text-left mr-auto tip-content">
-                    <ae-text face="mono-xs" > {{ tip.url }} </ae-text>
-                    <ae-address :value="tip.sender" length="flat" />
-                    <ae-text face="mono-xs" class="transactionDate">{{ new Date(tip.received_at).toLocaleString() }}</ae-text>
-                    <ae-text face="mono-xs"> {{ tip.note }} </ae-text>
+              </td>
+              <td>
+                  <div class="text-left mr-auto tip-content">
+                    <ae-text face="mono-xs" class="tip-url" > {{ tip.url }} </ae-text>
+                    <ae-text length="flat" class="sender"> {{ tip.sender }} </ae-text>
+                    <ae-text face="mono-xs" class="tip-note" > {{ tip.note }} </ae-text>
                 </div>
-                <div>
-                    <span class="balance">{{ tip.amount }}</span>
-                </div>
-            </ae-list-item>
-        </ae-list>
+              </td>
+              <td>
+                <ae-text face="mono-xs" class="transactionDate">{{ new Date(tip.received_at).toLocaleString('en-US', { hourCycle: 'h24' }) }}</ae-text>
+              </td>
+              <td>
+                <span class="balance">{{ tip.amount }}</span>
+              </td>
+              <td>
+                <span v-bind:class = "(tip.repaid)?'repaid':'unclaimed'" class="status status-label">{{ tip.repaid == true ? 'Repaid' : 'Unclaimed' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
     </div>
   </div>
   </div>
@@ -111,9 +138,9 @@
             let p = t[1]
             p.url = t[0][0]
             p.amount = this.convertToAE(p.amount)
-            temp.push(p)
+            if (p.received_at != 1578470791313) temp.push(p)
           });
-          return temp;
+          return temp.reverse();
         }
       },
       async created() {
@@ -136,45 +163,13 @@
 
 <style>
   #app-content {
+    margin-top: 2rem;
     max-width: 1200px;
     padding: 0 20px 20px;
   }
 
-  #check-contract {
-    margin-top: 10px;
-  }
-
-  #reset-contract {
-    margin-left: 10px;
-  }
-
-  .todo-list {
-    margin-top: 2rem;
-  }
-
-  .editor {
-    display: block;
-    max-width: 100vw;
-  }
-
   ul {
-  list-style: none;
-}
-
-  #add-todo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  #add-todo-button {
-    min-width: 170px;
-    margin-left: 10px;
-  }
-
-  .completed-task {
-    text-decoration: line-through;
+    list-style: none;
   }
 
   .errors div {
@@ -214,189 +209,212 @@
     box-sizing: border-box;
   }
 
-  .ae-check-button::after {
-    top: 2px !important;
-    left: 7px !important;
-    background-size: 1rem !important;
-  }
-
-  .non-completed-task {
-    width: 100%;
-    text-align: start;
-  }
-
-  #next-status-button {
-    padding: 0 0.8rem;
-    height: 40px;
-    float: right;
-  }
-
   .status-label {
-    padding: 5px;
-    border-radius: 5px;
+    padding: 2px;
+    border-radius: 2px;
   }
 
-  .status-label.InProgress {
-    background-color: yellow;
+  .status-label.unclaimed {
+    color: orange;
   }
 
-  .status-label.ReadyForReview {
-    color: white;
-    background-color: blue;
+  .status-label.repaid {
+    color: limegreen;
   }
 
-  .status-label.ToBeDeployed {
-    background-color: limegreen;
+  .sender {
+    font-weight: bold;
   }
 
-  .actions{
-      width:50%;
-      margin-top: 5px;
+  .actions {
+    width:50%;
+    margin-top: 5px;
   }
-  .tipWebsiteHeader  {
+
+  .tipWebsiteHeader {
       margin-bottom:20px;
   }
-    .ae-divider {
-        background-color: #bbbbbb !important;
-    }
-    .domainFavicon {
-        width:32px;
-        margin-right:15px;
-    }
-    .noFavicon {
-        font-size:0.8rem;
-        height:32px;
-        word-break: break-word;
-    }
-    .domainInfo {
+
+  .ae-divider {
+    background-color: #bbbbbb !important;
+  }
+
+  .domainFavicon {
+    width:32px;
+    margin-right:15px;
+  }
+
+  .noFavicon {
+    font-size:0.8rem;
+    height:32px;
+    word-break: break-word;
+  }
+
+  .domainInfo {
     flex-grow:1;
-    }
-    
-    .domain { 
-        position:relative;
-        cursor: pointer;
-    }
-    .domain:hover .full-domain{
-        display:block;
-    }
-    .full-domain {
-        display:none;
-        position:absolute;
-        left:0;
-        right: 0;
-        top: 115%;
-        background: #001833;
-        color: #fff;
-        padding: 5px;
-        border-radius: 6px;
-        word-break: break-word;
-        white-space: normal;
-        z-index: 15;
-        font-size: 0.8rem;
-    }
-    .full-domain:after {
-        content:"";
-        border: solid black;
-        border-width: 0 3px 3px 0;
-        display: inline-block;
-        padding: 3px;
-        transform: rotate(-135deg);
-        -webkit-transform: rotate(-135deg);
-        -ms-transform: rotate(-135deg);
-        position: absolute;
-        top: -4px;
-        left: 23px;
-        background: inherit;
-    }
-    h6{
-        margin:0;
-        word-break: break-word;
-    }
-    p {
-        margin:0;
-        font-weight:normal;
-    }
-    .ae-icon {
-        color: #fff !important;
-        width: 20px !important;
-        height: 20px !important;
-        font-size: 0.8rem;
-        margin-right: 2px;
-        border: 2px solid #dae1ea;
-    }
-.balance {
+  }
+
+  .domain { 
+    position:relative;
+    cursor: pointer;
+  }
+
+  .domain:hover .full-domain {
+      display:block;
+  }
+
+  .identicon {
+    padding-top: 2px;
+  }
+
+  .full-domain {
+    display:none;
+    position:absolute;
+    left:0;
+    right: 0;
+    top: 115%;
+    background: #001833;
+    color: #fff;
+    padding: 5px;
+    border-radius: 6px;
+    word-break: break-word;
+    white-space: normal;
+    z-index: 15;
+    font-size: 0.8rem;
+  }
+
+  .full-domain:after {
+    content:"";
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    position: absolute;
+    top: -4px;
+    left: 23px;
+    background: inherit;
+  }
+
+  h6 {
+    margin:0;
+    word-break: break-word;
+  }
+
+  p {
+    margin:0;
+    font-weight:normal;
+  }
+
+  .ae-icon {
+    color: #fff !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.8rem;
+    margin-right: 2px;
+    border: 2px solid #dae1ea;
+  }
+
+  .balance {
     color: red;
     font-size: 0.5em;
     font-weight:bold;
-}
-.textarea {
+  }
+
+  .textarea {
     min-height: 60px;
-}
-    .ae-badge {
-        border-radius:20px;
-        width:20%;
-        justify-content:center;
-        cursor: pointer;
-        background:#e4e4e4;
-    }
-    .ae-badge.primary {
-        background: #e4e4e4;
-        color:#fff;
-    }
-    .ae-badge.alternative {
-        background: #e4e4e4;
-        color:#fff;
-    }
-.sendTip { 
+  }
+
+  .ae-badge {
+    border-radius:20px;
+    width:20%;
+    justify-content:center;
+    cursor: pointer;
+    background:#e4e4e4;
+  }
+
+  .ae-badge.primary {
+    background: #e4e4e4;
+    color:#fff;
+  }
+
+  .ae-badge.alternative {
+    background: #e4e4e4;
+    color:#fff;
+  }
+
+  .sendTip { 
     margin-top:25px;
-}
-.tipSlider {
+  }
+
+  .tipSlider {
     margin:25px 0;
-}
-.hideSlider {
+  }
+
+  .container {
+    margin-top: 3rem;
+  }
+
+  .hideSlider {
     opacity: 0.3;
-}
-.amount-container{
+  }
+
+  .amount-container{
     position:relative;
-}
-.hideSlider .sliderOver {
+  }
+
+  .hideSlider .sliderOver {
     position:absolute;
     z-index:50;
     left:0;
     right:0;
     bottom:0;
     top:0;
-}
-.balanceInfo {
+  }
+
+  .balanceInfo {
     margin-top:15px;
-}
-.btn-50 {
+  }
+
+  .btn-50 {
     width:50%;
-}
-.ae-address {
+  }
+
+  .ae-address {
     font-weight: bold !important;
     color:#000;
-}
-.tabs {
-    margin-top:1rem;
-}
-.tabs span {
-    width:49%;
-}
+  }
 
-    .balance {
-        font-weight: bold;
-        font-size:2rem;
-        color:#000;
-    }
-    .balance:after {
-        font-size:1rem;
-        content:'AE'
-    }
-    small {
-        font-size:.8rem;
-    }
-.tip-content {
-    width:60%;
-}
+  .balance {
+    font-size: 1rem;
+    font-weight: bold;
+    color:#000;
+  }
+
+  .balance:after {
+    content:'AE'
+  }
+
+  small {
+    font-size:.8rem;
+  }
+
+  .tip-note {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .tip-url {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+
 </style>
