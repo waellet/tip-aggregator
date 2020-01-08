@@ -1,2 +1,2 @@
-# aepp-todolist
-Sophia simple todo-list aepp
+# Tip aggregator / explorer
+display tips
