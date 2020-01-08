@@ -148,6 +148,18 @@
               } catch (e) {
                 console.log(e)
               }
+            },
+            convertToAE(balance) {
+              return +(balance / 10 ** 18).toFixed(7);
+            },
+            parseTips(tips) {
+              let temp = [];
+              tips.forEach(t => {
+                let p = t[1]
+                p.url = t[0][0]
+                temp.push(p)
+              });
+              return temp;
             }
         },
         async created() {
@@ -162,6 +174,7 @@
 
             await this.getContractInstanceAtAddress(this.contractAddress);
             this.tips = await this.getContractState();
+            this.tips = this.parseTips(this.tips.tips);
             this.showLoading = false;
         },
     }
